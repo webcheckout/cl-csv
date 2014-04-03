@@ -73,7 +73,7 @@
 
 Keywords
 
-formatter: used to format val. Defaults to format-csv-value.
+formatter: used to format val. Defaults to *formatter*.
 
 quote: quoting character. Defaults to *quote*
 
@@ -83,7 +83,8 @@ newline: newline character. Defaults to *write-newline*
 
 always-quote: Defaults to *always-quote*")
   (:method (val csv-stream
-            &key (formatter #'format-csv-value)
+            &key
+            (formatter *formatter*)
             (quote *quote*)
             (separator *separator*)
             (escape *quote-escape*)
@@ -129,7 +130,8 @@ always-quote: Defaults to *always-quote*")
                       ((:quote *quote*) *quote*)
                       ((:escape *quote-escape*) *quote-escape*)
                       ((:newline *write-newline*) *write-newline*)
-                      ((:always-quote *always-quote*) *always-quote*))
+                      ((:always-quote *always-quote*) *always-quote*)
+                      ((:formatter *formatter*) *formatter*))
 "
 Writes a list items to stream
 
@@ -145,7 +147,9 @@ escape: escaping character. Defaults to *quote-escape*
 
 newline: newline character. Defaults to *write-newline*
 
-always-quote: Defaults to *always-quote*"
+always-quote: Defaults to *always-quote*
+
+formatter: function to use to format values to csv string. Defaults to *formatter*"
   (with-csv-output-stream (csv-stream stream)
     (iter (for item in (alexandria:ensure-list items))
       (unless (first-iteration-p)
@@ -162,7 +166,8 @@ always-quote: Defaults to *always-quote*"
                   ((:quote *quote*) *quote*)
                   ((:escape *quote-escape*) *quote-escape*)
                   ((:newline *write-newline*) *write-newline*)
-                  ((:always-quote *always-quote*) *always-quote*))
+                  ((:always-quote *always-quote*) *always-quote*)
+                  ((:formatter *formatter*) *formatter*))
   "Writes a csv to the given stream.
 
   rows-of-items: iterable
@@ -175,7 +180,8 @@ always-quote: Defaults to *always-quote*"
     quote: quoting character. Defaults to *quote*
     escape: escaping character. Defaults to *quote-escape*
     newline: newline character. Defaults to *write-newline*
-    always-quote: Defaults to *always-quote*"
+    always-quote: Defaults to *always-quote*
+    formatter: Default to *formatter*"
   (with-csv-output-stream (csv-stream stream)
     (iter (for row in rows-of-items)
       (write-csv-row row :stream csv-stream))
@@ -432,7 +438,8 @@ always-quote: Defaults to *always-quote*"
                               &optional skipping-header skip-first-p
                               separator separator
                               quote quote
-                              escaped-quote escaped-quote)
+                              escaped-quote escaped-quote
+                              formatter formatter)
   "in-csv driver for iterate"
   (alexandria:with-unique-names (stream opened? skip)
     `(progn
@@ -443,6 +450,7 @@ always-quote: Defaults to *always-quote*"
       (with *separator* = (or ,separator *separator*))
       (with *quote* = (or ,quote *quote*))
       (with *quote-escape* = (or ,escaped-quote *quote-escape*))
+      (with *formatter* = (or ,formatter *formatter*))
       (finally-protected
        (when (and ,stream ,opened?)
          (close ,stream)))

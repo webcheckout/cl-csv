@@ -17,7 +17,8 @@
 (defvar *quote-escape* #?"${ *quote* }${ *quote* }" "Default setting for escaping quotes")
 (defvar *unquoted-empty-string-is-nil* nil
   "Should unquoted empty string values, be nil or \"\".")
-
+(defvar *formatter* 'format-csv-value
+  "Function to use to convert lisp data to csv strings.")
 (defvar *quoted-empty-string-is-nil* nil
   "Should empty string values, be nil or \"\".
    Unquoted values are always trimmed of surrounding whitespace.
